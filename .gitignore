@@ -1,0 +1,7 @@
+.vscode
+
+DS_STORE
+desktop.ini
+
+# environment configs
+.env
