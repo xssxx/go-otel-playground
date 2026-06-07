@@ -18,3 +18,9 @@ services:
       - OTEL_SERVICE_NAME=rolldice
     depends_on:
       - jaeger
+
+networks:
+  jaeger:
+    driver: bridge
+  app:
+    driver: bridge

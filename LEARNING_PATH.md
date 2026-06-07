@@ -26,7 +26,7 @@
 
 ---
 
-### Step 2 — หลาย Span ใน Service เดียว (Child Spans)
+### ✅ Step 2 — หลาย Span ใน Service เดียว (Child Spans)
 
 **เป้าหมาย:** เห็น trace tree แบบ parent → child ใน Jaeger
 
@@ -47,7 +47,7 @@
 
 ---
 
-### Step 3 — เพิ่ม Metrics และ Logs ให้ครบ
+### ✅ Step 3 — เพิ่ม Metrics และ Logs ให้ครบ
 
 **เป้าหมาย:** เห็น 3 signals พร้อมกัน (Traces + Metrics + Logs)
 

@@ -45,6 +45,15 @@ func setupOTelSDK(ctx context.Context) (func(context.Context) error, error) {
 	prop := newPropagator()
 	otel.SetTextMapPropagator(prop)
 
+	// Set up meter provider.
+	meterProvider, err := newMeterProvider()
+	if err != nil {
+		handleErr(err)
+		return shutdown, err
+	}
+	shutdownFuncs = append(shutdownFuncs, meterProvider.Shutdown)
+	otel.SetMeterProvider(meterProvider)
+
 	// Set up trace provider.
 	tracerProvider, err := newTracerProvider()
 	if err != nil {
