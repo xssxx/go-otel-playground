@@ -3,17 +3,21 @@
 ---
 
 ### ✅ Step 0 — ที่ทำไปแล้ว
+
 **Trace endpoint เดียว**
+
 - HTTP handler สร้าง span
 - ส่ง trace ไป Jaeger ผ่าน OTLP/gRPC
 - ดู trace ใน Jaeger UI ได้
 
 ---
 
-### Step 1 — ทำให้ Span มีความหมายขึ้น
+### ✅ Step 1 — ทำให้ Span มีความหมายขึ้น
+
 **เป้าหมาย:** รู้ว่าใส่อะไรใน span ได้บ้าง
 
 สิ่งที่ทำ:
+
 - เพิ่ม **attributes** บน span เช่น `user.id`, `dice.sides`, `http.route`
 - เพิ่ม **events** บน span (จุดเวลาสำคัญในชีวิต request)
 - ทำให้ span แสดง **error** เมื่อเกิดข้อผิดพลาด (`span.RecordError`, `span.SetStatus`)
@@ -23,9 +27,11 @@
 ---
 
 ### Step 2 — หลาย Span ใน Service เดียว (Child Spans)
+
 **เป้าหมาย:** เห็น trace tree แบบ parent → child ใน Jaeger
 
 สิ่งที่ทำ:
+
 - แยก logic ออกเป็นฟังก์ชัน แล้วให้แต่ละฟังก์ชันสร้าง span ของตัวเอง
 - เช่น `rolldice` → เรียก `validateInput()` → เรียก `computeRoll()` → เรียก `saveResult()`
 - ส่ง `ctx` ต่อกันทุกฟังก์ชัน (นี่คือกุญแจสำคัญ)
@@ -42,9 +48,11 @@
 ---
 
 ### Step 3 — เพิ่ม Metrics และ Logs ให้ครบ
+
 **เป้าหมาย:** เห็น 3 signals พร้อมกัน (Traces + Metrics + Logs)
 
 สิ่งที่ทำ:
+
 - แก้ `otel.go` ให้ register `meterProvider` จริงๆ (ตอนนี้มันสร้างแต่ไม่ได้ใช้)
 - เพิ่ม metric ประเภทอื่น: `Histogram` วัด latency, `Gauge` วัด active connections
 - ดู log + trace ใน terminal และดู metric ผ่าน Prometheus/Grafana
@@ -54,9 +62,11 @@
 ---
 
 ### Step 4 — สอง Service คุยกัน (Context Propagation ข้าม Process)
+
 **เป้าหมาย:** trace เดียวกันวิ่งข้าม 2 service
 
 สิ่งที่ทำ:
+
 - สร้าง Service B (อีก Go binary หรืออีก port)
 - Service A (`rolldice`) เรียก Service B ผ่าน HTTP โดยใช้ `otelhttp.DefaultClient` หรือ inject header เอง
 - ใน Jaeger จะเห็น trace เดียวที่มี span จากทั้ง 2 service
@@ -72,9 +82,11 @@
 ---
 
 ### Step 5 — ระบบจริง: หลาย Service + Message Queue
+
 **เป้าหมาย:** trace ผ่าน async boundary
 
 สิ่งที่ทำ:
+
 - เพิ่ม Kafka หรือ RabbitMQ ระหว่าง service
 - inject trace context ลงใน message header
 - extract context ฝั่ง consumer แล้วสร้าง span ต่อ
@@ -85,9 +97,11 @@
 ---
 
 ### Step 6 — Observability Stack จริง
+
 **เป้าหมาย:** เลิกใช้ Jaeger all-in-one, ใช้ stack ที่ production-ready
 
 สิ่งที่ทำ:
+
 - เพิ่ม **OpenTelemetry Collector** เป็น middle layer (รับ signal แล้ว route ไปหลายที่)
 - Traces → Tempo หรือ Jaeger
 - Metrics → Prometheus → Grafana

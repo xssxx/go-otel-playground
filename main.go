@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"log"
 	"net"
@@ -34,13 +35,20 @@ func run() (err error) {
 		err = errors.Join(err, otelShutdown(context.Background()))
 	}()
 
+	// Set up SQLite.
+	db, err := initDB(ctx)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
 	// Start HTTP server.
 	srv := &http.Server{
 		Addr:         ":8080",
 		BaseContext:  func(net.Listener) context.Context { return ctx },
 		ReadTimeout:  time.Second,
 		WriteTimeout: 10 * time.Second,
-		Handler:      newHTTPHandler(),
+		Handler:      newHTTPHandler(db),
 	}
 	srvErr := make(chan error, 1)
 	go func() {
@@ -64,11 +72,11 @@ func run() (err error) {
 	return err
 }
 
-func newHTTPHandler() http.Handler {
+func newHTTPHandler(db *sql.DB) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/rolldice", rolldice)
-	mux.HandleFunc("/rolldice/{player}", rolldice)
+	mux.HandleFunc("/rolldice", rolldice(db))
+	mux.HandleFunc("/rolldice/{player}", rolldice(db))
 
 	// Add HTTP instrumentation for the whole server.
 	handler := otelhttp.NewHandler(mux, "/")

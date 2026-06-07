@@ -1,17 +1,20 @@
 services:
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    image: jaegertracing/all-in-one:1.57
     ports:
-      - "16686:16686"   # Jaeger UI
-      - "4317:4317"     # OTLP gRPC
+      - "16686:16686" # Jaeger UI
+      - "4317:4317" # OTLP gRPC
     environment:
       - COLLECTOR_OTLP_ENABLED=true
 
   app:
+    container_name: go-app
     build: .
     ports:
       - "8080:8080"
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+      - OTEL_SERVICE_NAME=rolldice
     depends_on:
       - jaeger
