@@ -16,11 +16,19 @@ services:
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
       - OTEL_SERVICE_NAME=rolldice
+      - LUCKY_SERVICE_URL=http://lucky:8081
     depends_on:
       - jaeger
+      - lucky
 
-networks:
-  jaeger:
-    driver: bridge
-  app:
-    driver: bridge
+  lucky:
+    container_name: lucky-service
+    build:
+      context: ./services/lucky
+    ports:
+      - "8081:8081"
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+      - OTEL_SERVICE_NAME=lucky-checker
+    depends_on:
+      - jaeger
