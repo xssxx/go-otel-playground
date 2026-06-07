@@ -42,6 +42,8 @@ func setupOTelSDK(ctx context.Context) (func(context.Context) error, error) {
 		err = errors.Join(inErr, shutdown(ctx))
 	}
 
+	// ลงทะเบียน propagator ไว้ที่ global
+	// ทำให้ otelhttp รู้ว่าต้อง inject/extract header "traceparent" เมื่อส่ง HTTP ออกหรือรับ HTTP เข้า
 	prop := newPropagator()
 	otel.SetTextMapPropagator(prop)
 
@@ -77,6 +79,8 @@ func setupOTelSDK(ctx context.Context) (func(context.Context) error, error) {
 
 func newPropagator() propagation.TextMapPropagator {
 	return propagation.NewCompositeTextMapPropagator(
+		// TraceContext คือ W3C standard — inject traceID และ spanID ลงใน header "traceparent"
+		// ทำให้ service ที่รับ request สามารถสร้าง span ต่อจาก trace เดิมได้
 		propagation.TraceContext{},
 		propagation.Baggage{},
 	)

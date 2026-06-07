@@ -61,7 +61,7 @@
 
 ---
 
-### Step 4 — สอง Service คุยกัน (Context Propagation ข้าม Process)
+### ✅ Step 4 — สอง Service คุยกัน (Context Propagation ข้าม Process)
 
 **เป้าหมาย:** trace เดียวกันวิ่งข้าม 2 service
 

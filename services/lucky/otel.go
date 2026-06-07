@@ -1,3 +1,5 @@
+// Service B
+
 package main
 
 import (
@@ -26,6 +28,9 @@ func setupOTelSDK(ctx context.Context) (func(context.Context) error, error) {
 		return err
 	}
 
+	// ลงทะเบียน propagator เหมือนกับ Service A
+	// TraceContext คือ W3C standard ที่ทำให้อ่าน header "traceparent" ได้
+	// ถ้าไม่ set ตรงนี้ Service B จะไม่รู้จัก header และจะสร้าง trace ใหม่แทนที่จะต่อจากเดิม
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
 		propagation.TraceContext{},
 		propagation.Baggage{},

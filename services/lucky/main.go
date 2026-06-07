@@ -48,7 +48,9 @@ func run() (err error) {
 		BaseContext:  func(net.Listener) context.Context { return ctx },
 		ReadTimeout:  time.Second,
 		WriteTimeout: 10 * time.Second,
-		Handler:      otelhttp.NewHandler(mux, "/"),
+		// otelhttp.NewHandler extract header "traceparent" จาก request ที่รับเข้ามา
+		// แล้วสร้าง span ต่อจาก traceID เดิมของ Service A ทำให้กลายเป็น trace เดียวกันใน Jaeger
+		Handler: otelhttp.NewHandler(mux, "/"),
 	}
 
 	srvErr := make(chan error, 1)
